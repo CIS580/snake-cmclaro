@@ -8,11 +8,12 @@ var backCtx = backBuffer.getContext('2d');
 var oldTime = performance.now();
 
 var gameOver = false;
-var apple = {x:Math.floor(Math.random() * backBuffer.height), y:Math.floor(Math.random() * backBuffer.height)};
+var apple = {x:Math.floor(Math.random() * backBuffer.height-25), y:Math.floor(Math.random() * backBuffer.height-25)};
 var score = 0;
 var snake = [];
 snake[0] = {x: backBuffer.width/2, y:backBuffer.height/2};
 var input;
+var size=1;
 
 function init(){
 input = {
@@ -94,26 +95,33 @@ function loop(newTime) {
  * the number of milliseconds passed since the last frame.
  */
 function update(elapsedTime) {
-  // TODO: Spawn an apple periodically
-  // TODO: Grow the snake periodically
+  // TODO: Spawn an apple periodically ---- spawns when apple is eaten
+  // TODO: Grow the snake periodically ---- gros when apple is eaten
   // TODO: Move the snake
   if(input.up || input.down || input.right || input.left) {
-    if(input.up) {
-      snake[0].y -= 2;
-    } else if(input.down) {
-      snake[0].y += 2;
-    } else if(input.right) {
-      snake[0].x += 2;
-    } else if(input.left) {
-      snake[0].x -= 2;
+    if(input.up) {snake[0].y -= 4;}
+	else if(input.down) {snake[0].y += 4;} 
+	else if(input.right) {snake[0].x += 4;} 
+	else if(input.left) {snake[0].x -= 4;}
+	for(i = size-1; i>0 ; i--) {
+      snake[i].x = snake[i-1].x;
+      snake[i].y = snake[i-1].y;
     }
   }
   // TODO: Determine if the snake has moved out-of-bounds (offscreen)
-  if(snake[0].x == 0 || snake[0].x > backBuffer.width || snake[0].y == 0 || snake[0].y == backBuffer.height) {
+  if(snake[0].x == 0 || snake[0].x > (backBuffer.width - 10) || snake[0].y == 0 || snake[0].y > (backBuffer.height - 10)) {
     gameOver = true;
   }
   // TODO: Determine if the snake has eaten an apple
-  // TODO: Determine if the snake has eaten its tail
+  if(snake[0].x < apple.x + 10 && snake[0].x + 10 > apple.x && snake[0].y < apple.y + 10 && 10 + snake[0].y > apple.y)
+  {
+	  score++;
+	  apple.x = Math.floor(Math.random() * backBuffer.width);
+	  apple.y = Math.floor(Math.random() * backBuffer.height);
+	  snake[size] = {x: snake[size-1].x, y: snake[size-1].y};
+	  size++;
+  }
+  // TODO: Determine if the snake has eaten its tail  
   // TODO: [Extra Credit] Determine if the snake has run into an obstacle
 
 }
@@ -136,7 +144,7 @@ function render(elapsedTime) {
   backCtx.fillStyle = "Red";
   backCtx.fillRect(apple.x, apple.y, 10, 10)
   
-  backCtx.fillStyle = "Green";
+  backCtx.fillStyle = "purple";
   for(i = 0; i < snake.length; i++) {
     backCtx.fillRect(snake[i].x, snake[i].y, 10, 10);
   }
